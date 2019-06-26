@@ -60,7 +60,7 @@ public class WindowsDockerClient extends DockerClient {
 
     @Override
     public List<String> listProcess(@Nonnull EnvVars launchEnv, @Nonnull String containerId) throws IOException, InterruptedException {
-        LaunchResult result = launch(launchEnv, false, null, "docker", "top", containerId);
+        LaunchResult result = launch(launchEnv, false, "docker", "top", containerId);
         if (result.getStatus() != 0) {
             throw new IOException(String.format("Failed to run top '%s'. Error: %s", containerId, result.getErr()));
         }
@@ -84,17 +84,17 @@ public class WindowsDockerClient extends DockerClient {
     @Override
     public Optional<String> getContainerIdIfContainerized() throws IOException, InterruptedException {
         if (node == null ||
-            launch(new EnvVars(), true, null, "sc.exe", "query", "cexecsvc").getStatus() != 0) {
+            launch(new EnvVars(), true, "sc.exe", "query", "cexecsvc").getStatus() != 0) {
             return Optional.absent();
         }
 
-        LaunchResult getComputerName = launch(new EnvVars(), true, null, "hostname");
+        LaunchResult getComputerName = launch(new EnvVars(), true, "hostname");
         if(getComputerName.getStatus() != 0) {
             throw new IOException("Failed to get hostname.");
         }
 
         String shortID = getComputerName.getOut().toLowerCase();
-        LaunchResult getLongIdResult = launch(new EnvVars(), true, null, "docker", "inspect", shortID, "--format={{.Id}}");
+        LaunchResult getLongIdResult = launch(new EnvVars(), true, "docker", "inspect", shortID, "--format={{.Id}}");
         if(getLongIdResult.getStatus() != 0) {
             LOGGER.log(Level.INFO, "Running inside of a container but cannot determine container ID from current environment.");
             return Optional.absent();
@@ -111,8 +111,8 @@ public class WindowsDockerClient extends DockerClient {
         }
     }
 
-    private LaunchResult launch(EnvVars env, boolean quiet, FilePath workDir, String... args) throws IOException, InterruptedException {
-        return launch(env, quiet, workDir, new ArgumentListBuilder(args));
+    private LaunchResult launch(EnvVars env, boolean quiet, String... args) throws IOException, InterruptedException {
+        return launch(env, quiet, null, new ArgumentListBuilder(args));
     }
     private LaunchResult launch(EnvVars env, boolean quiet, FilePath workDir, ArgumentListBuilder argb) throws IOException, InterruptedException {
         if (LOGGER.isLoggable(Level.FINE)) {

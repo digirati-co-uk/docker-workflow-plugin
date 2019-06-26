@@ -25,16 +25,23 @@ package org.jenkinsci.plugins.docker.workflow;
 
 import com.google.common.base.Optional;
 import com.google.inject.Inject;
-import hudson.*;
+import hudson.AbortException;
+import hudson.EnvVars;
+import hudson.Extension;
+import hudson.FilePath;
+import hudson.Launcher;
+import hudson.LauncherDecorator;
+import hudson.Proc;
+import hudson.Util;
 import hudson.model.Computer;
 import hudson.model.Node;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.slaves.WorkspaceList;
 import hudson.util.VersionNumber;
-import java.util.concurrent.TimeUnit;
+
 import java.util.stream.Collectors;
-import javax.annotation.CheckForNull;
+
 import org.jenkinsci.plugins.docker.commons.fingerprint.DockerFingerprints;
 import org.jenkinsci.plugins.docker.commons.tools.DockerTool;
 import org.jenkinsci.plugins.docker.workflow.client.DockerClient;
